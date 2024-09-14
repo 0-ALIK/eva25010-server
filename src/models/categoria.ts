@@ -1,14 +1,14 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { Subcategoria } from "./subcategoria";
 import { SoftwareCategoria } from "./software_categoria";
 import { PreguntaCustom } from "./pregunta_custom";
 
 @Entity()
 export class Categoria {
-    @PrimaryGeneratedColumn()
-    public id: number;
+    @PrimaryColumn({length: 3})
+    public id: string;
 
-    @Column({ length: 100 })
+    @Column({length: 100, unique: true})
     public nombre: string;
 
     @OneToMany(() => Subcategoria, subcategoria => subcategoria.categoria)

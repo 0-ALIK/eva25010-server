@@ -6,7 +6,7 @@ export class TipoSoftware {
     @PrimaryGeneratedColumn()
     public id: number;
 
-    @Column({length: 100})
+    @Column({length: 100, unique: true})
     public nombre: string;
 
     @OneToMany(() => Software, software => software.tipoSoftware)

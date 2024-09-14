@@ -1,8 +1,9 @@
-import { Column, CreateDateColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Categoria } from "./categoria";
 import { Software } from "./software";
 import { RespuestaCustom } from "./respuesta_custom";
 
+@Entity()
 export class PreguntaCustom {
     @PrimaryGeneratedColumn()
     public id: number;

@@ -1,13 +1,13 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { Categoria } from "./categoria";
 import { Pregunta } from "./pregunta";
 
 @Entity()
 export class Subcategoria {
-    @PrimaryGeneratedColumn()
-    public id: number;
+    @PrimaryColumn({length: 3})
+    public id: string;
 
-    @Column({ length: 100 })
+    @Column({length: 100, unique: true})
     public nombre: string;
 
     @ManyToOne(() => Categoria, categoria => categoria.subcategorias, {onDelete: 'SET NULL', onUpdate: 'CASCADE'})
