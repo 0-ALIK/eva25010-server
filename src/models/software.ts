@@ -1,0 +1,46 @@
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Usuario } from "./usuario";
+import { TipoSoftware } from "./tipo_software";
+import { Licencia } from "./licencia";
+import { SoftwareCategoria } from "./software_categoria";
+import { Evaluacion } from "./evaluacion";
+import { PreguntaCustom } from "./pregunta_custom";
+
+@Entity()
+export class Software {
+    @PrimaryGeneratedColumn()
+    public id: number;
+
+    @Column({length: 100})
+    public nombre: string;
+
+    @Column({length: 20})
+    public version: string;
+
+    @Column({type: 'text'})
+    public descripcion: string;
+
+    @ManyToOne(() => Usuario, usuario => usuario.software, {onDelete: 'CASCADE', onUpdate: 'CASCADE'})
+    public usuario: Usuario;
+
+    @ManyToOne(() => TipoSoftware, tipoSoftware => tipoSoftware.software, {onDelete: 'SET NULL', onUpdate: 'CASCADE'})
+    public tipoSoftware: TipoSoftware;
+
+    @ManyToOne(() => Licencia, licencia => licencia.software, {onDelete: 'SET NULL', onUpdate: 'CASCADE'})
+    public licencia: Licencia;
+
+    @OneToMany(() => SoftwareCategoria, softwareCategoria => softwareCategoria.software)
+    public categorias: SoftwareCategoria[];
+
+    @OneToMany(() => Evaluacion, evaluacion => evaluacion.software)
+    public evaluaciones: Evaluacion[];
+
+    @OneToMany(() => PreguntaCustom, preguntaCustom => preguntaCustom.software)
+    public preguntasCustom: PreguntaCustom[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
+}
