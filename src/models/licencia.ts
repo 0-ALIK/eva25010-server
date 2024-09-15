@@ -1,8 +1,8 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Software } from "./software";
 
 @Entity()
-export class Licencia {
+export class Licencia extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id: number;
 

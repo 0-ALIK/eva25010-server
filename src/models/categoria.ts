@@ -1,10 +1,10 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { Subcategoria } from "./subcategoria";
 import { SoftwareCategoria } from "./software_categoria";
 import { PreguntaCustom } from "./pregunta_custom";
 
 @Entity()
-export class Categoria {
+export class Categoria extends BaseEntity {
     @PrimaryColumn({length: 3})
     public id: string;
 

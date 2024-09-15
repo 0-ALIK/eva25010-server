@@ -1,9 +1,9 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { PreguntaCustom } from "./pregunta_custom";
 import { Evaluacion } from "./evaluacion";
 
 @Entity()
-export class RespuestaCustom {
+export class RespuestaCustom extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id: number;
 

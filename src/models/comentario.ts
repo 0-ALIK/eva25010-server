@@ -1,8 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { Evaluacion } from "./evaluacion";
 
 @Entity()
-export class Comentario {
+export class Comentario extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id: number;
 

@@ -1,9 +1,8 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Software } from "./software";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { SubtipoSoftware } from "./subtipo_software";
 
 @Entity('tipo_software')
-export class TipoSoftware {
+export class TipoSoftware extends BaseEntity {
     @PrimaryGeneratedColumn()
     public id: number;
 
