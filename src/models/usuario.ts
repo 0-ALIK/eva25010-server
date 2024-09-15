@@ -23,6 +23,9 @@ export class Usuario {
     @Column({length: 100, nullable: true})
     public cargo: string;
 
+    @Column({length: 255, nullable: true})
+    public foto: string;
+
     @ManyToOne(() => Profesion, profesion => profesion.usuarios, {onDelete: 'SET NULL', onUpdate: 'CASCADE'})
     public profesion: Profesion;
 
