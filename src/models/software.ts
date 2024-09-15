@@ -1,10 +1,10 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Usuario } from "./usuario";
-import { TipoSoftware } from "./tipo_software";
 import { Licencia } from "./licencia";
 import { SoftwareCategoria } from "./software_categoria";
 import { Evaluacion } from "./evaluacion";
 import { PreguntaCustom } from "./pregunta_custom";
+import { SubtipoSoftware } from "./subtipo_software";
 
 @Entity()
 export class Software {
@@ -23,8 +23,8 @@ export class Software {
     @ManyToOne(() => Usuario, usuario => usuario.software, {onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     public usuario: Usuario;
 
-    @ManyToOne(() => TipoSoftware, tipoSoftware => tipoSoftware.software, {onDelete: 'SET NULL', onUpdate: 'CASCADE'})
-    public tipoSoftware: TipoSoftware;
+    @ManyToOne(() => SubtipoSoftware, tipoSoftware => tipoSoftware.software, {onDelete: 'SET NULL', onUpdate: 'CASCADE'})
+    public subtipoSoftware: SubtipoSoftware;
 
     @ManyToOne(() => Licencia, licencia => licencia.software, {onDelete: 'SET NULL', onUpdate: 'CASCADE'})
     public licencia: Licencia;

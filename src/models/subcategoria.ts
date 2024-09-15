@@ -4,7 +4,7 @@ import { Pregunta } from "./pregunta";
 
 @Entity()
 export class Subcategoria {
-    @PrimaryColumn({length: 3})
+    @PrimaryColumn({length: 5})
     public id: string;
 
     @Column({length: 100, unique: true})

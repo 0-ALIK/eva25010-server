@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Software } from "./software";
+import { SubtipoSoftware } from "./subtipo_software";
 
 @Entity('tipo_software')
 export class TipoSoftware {
@@ -9,8 +10,8 @@ export class TipoSoftware {
     @Column({length: 100, unique: true})
     public nombre: string;
 
-    @OneToMany(() => Software, software => software.tipoSoftware)
-    public software: Software[];
+    @OneToMany(() => SubtipoSoftware, subtipoSoftware => subtipoSoftware.tipoSoftware)
+    public subtiposSoftware: SubtipoSoftware[];
 
     @CreateDateColumn()
     createdAt: Date;
