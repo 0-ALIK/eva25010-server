@@ -17,7 +17,7 @@ export class Usuario {
     @Column({length: 255, unique: true})
     public correo: string;
 
-    @Column({length: 255})
+    @Column({length: 255, select: false})
     public password: string;
 
     @Column({length: 100, nullable: true})
