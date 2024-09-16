@@ -18,7 +18,12 @@ export async function validarSesion(req: Request, res: Response, next: NextFunct
             return res.status(401).send({msg: 'Token invalido'});
         }
 
-        const usuario = await dataSource.getRepository(Usuario).findOneBy({id: payload.id});
+        const usuario = await dataSource.getRepository(Usuario).findOne({
+            where: { id: payload.id },
+            relations: {
+                profesion: true        
+            }
+        });
 
         if (!usuario) {
             return res.status(401).send({msg: 'Usuario no encontrado'});

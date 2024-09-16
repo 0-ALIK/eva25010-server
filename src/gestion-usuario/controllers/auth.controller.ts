@@ -12,18 +12,15 @@ export class AuthController {
 
         try {
             const usuario = await dataSource.getRepository(Usuario).findOne({
-                where: {
-                    correo
+                where: { correo },
+                relations: {
+                    profesion: true
                 },
                 select: {
                     id: true,
                     nombre: true,
                     apellido: true,
                     cargo: true,
-                    profesion: {
-                        id: true,
-                        nombre: true
-                    },
                     correo: true,
                     password: true,
                     createdAt: true,
