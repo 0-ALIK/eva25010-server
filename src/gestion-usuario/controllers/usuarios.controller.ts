@@ -9,14 +9,14 @@ export class UsuariosController {
     public async update(req: Request, res: Response) {
         const dataSource = DatabaseConnectionService.connection;
         const { usuarioAuth, nombre, apellido, cargo, profesionId } = req.body;
-
+        
         try {
             await dataSource.getRepository(Usuario).update(usuarioAuth.id, {
                 nombre: nombre || usuarioAuth.nombre,
                 apellido: apellido || usuarioAuth.apellido,
                 cargo: cargo || usuarioAuth.cargo,
                 profesion: {
-                    id: profesionId || usuarioAuth.profesion.id
+                    id: profesionId || usuarioAuth.profesion?.id
                 }
             });
 

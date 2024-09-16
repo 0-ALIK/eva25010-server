@@ -11,7 +11,25 @@ export class AuthController {
         const { correo, password } = req.body;
 
         try {
-            const usuario = await dataSource.getRepository(Usuario).findOneBy({ correo });
+            const usuario = await dataSource.getRepository(Usuario).findOne({
+                where: {
+                    correo
+                },
+                select: {
+                    id: true,
+                    nombre: true,
+                    apellido: true,
+                    cargo: true,
+                    profesion: {
+                        id: true,
+                        nombre: true
+                    },
+                    correo: true,
+                    password: true,
+                    createdAt: true,
+                    updatedAt: true 
+                }
+            });
 
             if(!usuario) {
                 return res.status(401).json({ msg: 'Correo / contraseña incorrectos' });
@@ -21,11 +39,13 @@ export class AuthController {
                 return res.status(401).json({ msg: 'Correo / contraseña incorrectos' });
             }
 
-            const token = JWTService.generarToken({ id: usuario.id, correo: usuario.correo });
+            const token = await JWTService.generarToken({ id: usuario.id, correo: usuario.correo });
 
             if(!token) {
                 return res.status(500).json({ msg: 'Error al generar token' });
             }
+
+            delete (usuario as any).password;
 
             return res.status(200).json({
                 usuario,
@@ -49,7 +69,7 @@ export class AuthController {
                 password: PasswordEncrypt.hashPassword(password)
             });
 
-            const token = JWTService.generarToken({ id: usuario.id, correo: usuario.correo });
+            const token = await JWTService.generarToken({ id: usuario.id, correo: usuario.correo });
 
             return res.status(201).json({
                 usuario,
