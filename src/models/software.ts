@@ -5,6 +5,7 @@ import { SoftwareCategoria } from "./software_categoria";
 import { Evaluacion } from "./evaluacion";
 import { PreguntaCustom } from "./pregunta_custom";
 import { SubtipoSoftware } from "./subtipo_software";
+import { ImagenPreview } from "./imagen_preview";
 
 @Entity()
 export class Software extends BaseEntity {
@@ -16,6 +17,9 @@ export class Software extends BaseEntity {
 
     @Column({length: 20})
     public version: string;
+
+    @Column({length: 255})
+    public portada: string;
 
     @Column({type: 'text'})
     public descripcion: string;
@@ -37,6 +41,9 @@ export class Software extends BaseEntity {
 
     @OneToMany(() => PreguntaCustom, preguntaCustom => preguntaCustom.software)
     public preguntasCustom: PreguntaCustom[];
+
+    @OneToMany(() => ImagenPreview, imagenPreview => imagenPreview.software)
+    public imagenesPreview: ImagenPreview[];
 
     @CreateDateColumn()
     createdAt: Date;
