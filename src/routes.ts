@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { GestionUsuarioRoutes } from "./gestion-usuario/gestion_usuario.routes";
+import { GestionPublicacionesRoutes } from "./gestion-publicaciones/gestion_publicaciones.routes";
 
 export class Routes {
 
@@ -7,6 +8,7 @@ export class Routes {
         const router = Router();
 
         router.use('/api/gestion-usuario', GestionUsuarioRoutes.routes);
+        router.use('/api/gestion-publicaciones', GestionPublicacionesRoutes.routes);
 
         return router;
     }

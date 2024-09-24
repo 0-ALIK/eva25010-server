@@ -3,7 +3,6 @@ import { Usuario } from "./usuario";
 import { Licencia } from "./licencia";
 import { SoftwareCategoria } from "./software_categoria";
 import { Evaluacion } from "./evaluacion";
-import { PreguntaCustom } from "./pregunta_custom";
 import { SubtipoSoftware } from "./subtipo_software";
 import { ImagenPreview } from "./imagen_preview";
 
@@ -38,9 +37,6 @@ export class Software extends BaseEntity {
 
     @OneToMany(() => Evaluacion, evaluacion => evaluacion.software)
     public evaluaciones: Evaluacion[];
-
-    @OneToMany(() => PreguntaCustom, preguntaCustom => preguntaCustom.software)
-    public preguntasCustom: PreguntaCustom[];
 
     @OneToMany(() => ImagenPreview, imagenPreview => imagenPreview.software)
     public imagenesPreview: ImagenPreview[];

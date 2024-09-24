@@ -1,7 +1,6 @@
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, UpdateDateColumn } from "typeorm";
 import { Subcategoria } from "./subcategoria";
 import { SoftwareCategoria } from "./software_categoria";
-import { PreguntaCustom } from "./pregunta_custom";
 
 @Entity()
 export class Categoria extends BaseEntity {
@@ -16,9 +15,6 @@ export class Categoria extends BaseEntity {
 
     @OneToMany(() => SoftwareCategoria, softwareCategoria => softwareCategoria.categoria)
     public softwareCategorias: SoftwareCategoria[];
-
-    @OneToMany(() => PreguntaCustom, preguntaCustom => preguntaCustom.categoria)
-    public preguntasCustom: PreguntaCustom[];
 
     @CreateDateColumn()
     createdAt: Date;

@@ -1,7 +1,6 @@
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Categoria } from "./categoria";
-import { Software } from "./software";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { RespuestaCustom } from "./respuesta_custom";
+import { SoftwareCategoria } from "./software_categoria";
 
 @Entity()
 export class PreguntaCustom extends BaseEntity{
@@ -11,14 +10,13 @@ export class PreguntaCustom extends BaseEntity{
     @Column({length: 500})
     public descripcion: string;    
 
-    @ManyToOne(() => Categoria, categoria => categoria.preguntasCustom, {onDelete: 'CASCADE', onUpdate: 'CASCADE'})
-    public categoria: Categoria;
-
-    @ManyToOne(() => Software, software => software.preguntasCustom, {onDelete: 'CASCADE', onUpdate: 'CASCADE'})
-    public software: Software;
-
     @OneToMany(() => RespuestaCustom, respuesta => respuesta.pregunta)
     public respuestas: RespuestaCustom[];
+
+    @OneToOne(() => SoftwareCategoria, softwareCategoria => softwareCategoria.preguntaCustom, {onDelete: 'CASCADE', onUpdate: 'CASCADE'})
+    @JoinColumn()
+    @Unique(["softwareCategoria"])
+    public softwareCategoria: SoftwareCategoria;
 
     @CreateDateColumn()
     createdAt: Date;
