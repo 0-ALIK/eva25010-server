@@ -105,7 +105,141 @@ export class SoftwareController {
         }
     }
 
-    public async obtenerSoftwarePropio(req: Request, res: Response): Promise<void> {}
+    public async obtenerSoftwarePropio(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { usuarioAuth } = req.body;
 
-    public async obtenerSoftwarePropioById(req: Request, res: Response): Promise<void> {}
+        try {
+            const software = await dataSource.getRepository(Software).find({
+                where: {
+                    usuario: { id: usuarioAuth.id }
+                },
+                relations: {
+                    subtipoSoftware: true,
+                    licencia: true,
+                }
+            });
+
+            res.status(200).json(software);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener software propio' });
+        }
+    }
+
+    public async obtenerSoftwarePropiosById(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid } = req.params;
+
+        try {
+            const software = await dataSource.getRepository(Software).findOne({
+                where: {
+                    id: Number(softwareid)
+                },
+                relations: {
+                    subtipoSoftware: { tipoSoftware: true },
+                    licencia: true,
+                    imagenesPreview: true,
+                    categorias: {
+                        categoria: true,
+                        preguntaCustom: true
+                    }
+                }
+            });
+
+            res.status(200).json(software);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener software propio por id' });
+        }
+    }
+
+    public async editarPortada(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid } = req.params;
+        const { portada, currentSoftware } = req.body;
+
+        try {
+            console.log(currentSoftware);
+            
+            if(currentSoftware.portada) {
+                const deleteResult = await FileUploadService.delete(currentSoftware.portada);
+
+                if(!deleteResult.correct) {
+                    throw new Error('Error al eliminar la foto de portada');
+                }
+            }
+
+            const uploadResult = await FileUploadService.upload(portada);
+
+            if(!uploadResult.correct) {
+                throw new Error('Error al subir la foto de portada');
+            }
+
+            await dataSource.getRepository(Software).update(softwareid, {
+                portada: uploadResult.url
+            });
+
+            res.status(200).json({ msg: 'Portada editada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al editar la portada' });
+        }
+    }
+
+    public async agregarImagenPreview(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid } = req.params;
+        const { imagenPreview } = req.body;
+
+        try {
+            const uploadResult = await FileUploadService.upload(imagenPreview);
+
+            if(!uploadResult.correct) {
+                throw new Error('Error al subir la imagen preview');
+            }
+
+            await dataSource.getRepository(ImagenPreview).save({
+                imagen: uploadResult.url,
+                software: { id: Number(softwareid) }                
+            });
+
+            res.status(201).json({ msg: 'Imagen preview agregada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al agregar una imagen preview' });
+        }
+    }
+
+    public async eliminarImagenPreview(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid, imagenid } = req.params;
+
+        try {
+            const imagenPreview = await dataSource.getRepository(ImagenPreview).findOne({
+                where: {
+                    id: Number(imagenid),
+                    software: { id: Number(softwareid) }
+                }
+            });
+
+            if(!imagenPreview) {
+                res.status(404).json({ msg: 'Imagen preview no encontrada' });
+                return;
+            }
+
+            const deleteResult = await FileUploadService.delete(imagenPreview.imagen);
+
+            if(!deleteResult.correct) {
+                throw new Error('Error al eliminar la imagen preview');
+            }
+
+            await dataSource.getRepository(ImagenPreview).delete(imagenid);
+
+            res.status(200).json({ msg: 'Imagen preview eliminada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al eliminar una imagen preview' });
+        }
+    }
 }

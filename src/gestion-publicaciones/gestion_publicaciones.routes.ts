@@ -6,7 +6,7 @@ import { filesToBody } from "../global/middlewares/files";
 import { parseJsonCampos } from "../global/middlewares/parse-json-campos";
 import { check } from "express-validator";
 import { imagenExtensiones, validarExtension } from "../global/validators/validar-extension";
-import { existeLicencia, existeSubtipoSoftware } from "./validators/existe-software";
+import { existeCategoria, existeLicencia, existeSubtipoSoftware } from "./validators/existe-software";
 import { softwarePertenece } from "./middlewares/pertenece";
 
 export class GestionPublicacionesRoutes {
@@ -38,6 +38,7 @@ export class GestionPublicacionesRoutes {
             check('imagenesPreview.*').custom( archivo => validarExtension(archivo, [...imagenExtensiones ])),
             check('categorias', 'Las categorias son requeridas').notEmpty(),
             check('categorias.*.categoria', 'La categoria debe ser string').notEmpty().isString(),
+            check('categorias.*.categoria').custom( existeCategoria ),
             check('categorias.*.pregunta', 'La pregunta es requerida').optional().isString(),
             mostrarErrores
         ], softwareController.crear);
@@ -45,6 +46,8 @@ export class GestionPublicacionesRoutes {
         router.put('/software/:softwareid', [
             validarSesion,
             filesToBody,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
             softwarePertenece(),
             check('nombre', 'El nombre debe tener entre 5 y 100 caracteres').optional().isLength({ min: 5, max: 100 }),
             check('descripcion', 'La descripción es requerida').optional().notEmpty(),
@@ -57,6 +60,50 @@ export class GestionPublicacionesRoutes {
         ], softwareController.editar);
 
         router.get('/software/licencias', softwareController.obtenerLicencias);
+
+        router.get('/software/propios', validarSesion, softwareController.obtenerSoftwarePropio);
+
+        router.get('/software/propios/:softwareid', [
+            validarSesion,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
+            softwarePertenece(),
+            mostrarErrores
+        ], softwareController.obtenerSoftwarePropiosById);
+
+        router.post('/software/portada/:softwareid', [
+            validarSesion,
+            filesToBody,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
+            softwarePertenece(),
+            check('portada', 'La portada es requerida').notEmpty(),
+            check('portada', 'La portada no es un archivo').isObject(),
+            check('portada').custom( archivo => validarExtension(archivo, [...imagenExtensiones ])),
+            mostrarErrores
+        ], softwareController.editarPortada);
+
+        router.post('/software/imagenes-preview/:softwareid', [
+            validarSesion,
+            filesToBody,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
+            softwarePertenece(),
+            check('imagenPreview', 'La imagen preview es requerida').notEmpty(),
+            check('imagenPreview', 'La imagen preview no es un archivo').isObject(),
+            check('imagenPreview').custom( archivo => validarExtension(archivo, [...imagenExtensiones ])),
+            mostrarErrores
+        ], softwareController.agregarImagenPreview);
+
+        router.delete('/software/imagenes-preview/:softwareid/:imagenid', [
+            validarSesion,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
+            softwarePertenece(),
+            check('imagenid', 'El id de la imagen preview es requerido').notEmpty(),
+            check('imagenid', 'El id de la imagen preview debe ser un número').isNumeric(),
+            mostrarErrores
+        ], softwareController.eliminarImagenPreview);
 
         return router;
     }
