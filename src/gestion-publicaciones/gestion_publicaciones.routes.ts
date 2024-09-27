@@ -62,6 +62,14 @@ export class GestionPublicacionesRoutes {
 
         router.get('/software/licencias', softwareController.obtenerLicencias);
 
+        router.get('/software/tipos', softwareController.obtenerTipos);
+
+        router.get('/software/subtipos/:tipoid', [
+            check('tipoid', 'El id del tipo es requerido').notEmpty(),
+            check('tipoid', 'El id del tipo debe ser un número').isNumeric(),
+            mostrarErrores
+        ], softwareController.obtenerSubtipos);
+
         router.get('/software/propios', validarSesion, softwareController.obtenerSoftwarePropio);
 
         router.get('/software/propios/:softwareid', [

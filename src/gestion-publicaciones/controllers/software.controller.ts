@@ -6,6 +6,8 @@ import { ImagenPreview } from "../../models/imagen_preview";
 import { SoftwareCategoria } from "../../models/software_categoria";
 import { PreguntaCustom } from "../../models/pregunta_custom";
 import { Licencia } from "../../models/licencia";
+import { TipoSoftware } from "../../models/tipo_software";
+import { SubtipoSoftware } from "../../models/subtipo_software";
 
 export class SoftwareController {
 
@@ -102,6 +104,36 @@ export class SoftwareController {
         } catch (error) {
             console.error(error);
             res.status(500).json({ msg: 'Error al obtener licencias' });
+        }
+    }
+
+    public async obtenerTipos(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+    
+        try {
+            const tipos = await dataSource.getRepository(TipoSoftware).find();
+            res.status(200).json(tipos);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener tipos de software' });
+        }
+    }
+
+    public async obtenerSubtipos(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { tipoid } = req.params;
+
+        try {
+            const subtipos = await dataSource.getRepository(SubtipoSoftware).find({
+                where: {
+                    tipoSoftware: { id: Number(tipoid) }
+                }
+            });
+
+            res.status(200).json(subtipos);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener subtipos de software' });
         }
     }
 
