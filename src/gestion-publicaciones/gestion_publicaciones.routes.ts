@@ -8,6 +8,7 @@ import { check } from "express-validator";
 import { imagenExtensiones, validarExtension } from "../global/validators/validar-extension";
 import { existeCategoria, existeLicencia, existeSubtipoSoftware } from "./validators/existe-software";
 import { softwarePertenece } from "./middlewares/pertenece";
+import { existeCategoriaEnSoftware } from "./middlewares/existe";
 
 export class GestionPublicacionesRoutes {
 
@@ -104,6 +105,28 @@ export class GestionPublicacionesRoutes {
             check('imagenid', 'El id de la imagen preview debe ser un número').isNumeric(),
             mostrarErrores
         ], softwareController.eliminarImagenPreview);
+
+        router.post('/software/categorias/:softwareid/:categoriaid', [
+            validarSesion,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            softwarePertenece(),
+            check('categoriaid', 'El id de la categoria es requerido').notEmpty(),
+            check('categoriaid', 'El id de la categoria debe ser un número').isNumeric(),
+            check('categoriaid').custom( existeCategoria ),
+            existeCategoriaEnSoftware(false),
+            mostrarErrores
+        ], softwareController.agregarCategoria);
+
+        router.delete('/software/categorias/:softwareid/:categoriaid', [
+            validarSesion,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            softwarePertenece(),
+            check('categoriaid', 'El id de la categoria es requerido').notEmpty(),
+            check('categoriaid', 'El id de la categoria debe ser un número').isNumeric(),
+            check('categoriaid').custom( existeCategoria ),
+            existeCategoriaEnSoftware(),
+            mostrarErrores
+        ], softwareController.quitarCategoria);
 
         return router;
     }

@@ -242,4 +242,39 @@ export class SoftwareController {
             res.status(500).json({ msg: 'Error al eliminar una imagen preview' });
         }
     }
+
+    public async agregarCategoria(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid, categoriaid } = req.params;
+
+        try {
+            await dataSource.getRepository(SoftwareCategoria).save({
+                software: { id: Number(softwareid) },
+                categoria: { id: categoriaid }
+            });
+
+            res.status(201).json({ msg: 'Categoria agregada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al agregar una categoria' });
+        }
+    }
+
+    public async quitarCategoria(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid, categoriaid } = req.params;
+
+        try {
+            await dataSource.getRepository(SoftwareCategoria).delete({
+                software: { id: Number(softwareid) },
+                categoria: { id: categoriaid }
+            });
+
+            res.status(200).json({ msg: 'Categoria eliminada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al eliminar una categoria' });
+        }
+    }
+
 }
