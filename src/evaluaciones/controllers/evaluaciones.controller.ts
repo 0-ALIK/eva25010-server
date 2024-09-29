@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { DatabaseConnectionService } from '../../global/services/database-connection';
 import { Categoria } from '../../models/categoria';
 import { Subcategoria } from '../../models/subcategoria';
+import { Pregunta } from '../../models/pregunta';
 
 export class EvaluacionesController {
 
@@ -32,6 +33,24 @@ export class EvaluacionesController {
         } catch (error) {
             console.error(error);
             res.status(500).json({ msg: 'Error al obtener las subcategorias' });
+        }
+    }
+
+    public async obtenerPreguntas(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { subcategoriaid } = req.params;
+
+        try {
+            const preguntas = await dataSource.getRepository(Pregunta).find({
+                where: {
+                    subcategoria: { id: subcategoriaid }
+                }
+            });
+
+            res.status(200).json(preguntas);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener las preguntas' });
         }
     }
 

@@ -5,6 +5,7 @@ import { SoftwareCategoria } from "./software_categoria";
 import { Evaluacion } from "./evaluacion";
 import { SubtipoSoftware } from "./subtipo_software";
 import { ImagenPreview } from "./imagen_preview";
+import { SoftwareTecnologia } from "./software_tecnologia";
 
 @Entity()
 export class Software extends BaseEntity {
@@ -40,6 +41,9 @@ export class Software extends BaseEntity {
 
     @OneToMany(() => ImagenPreview, imagenPreview => imagenPreview.software)
     public imagenesPreview: ImagenPreview[];
+
+    @OneToMany(() => SoftwareTecnologia, softwareTecnologia => softwareTecnologia.software)
+    public softwareTecnologias: SoftwareTecnologia[];
 
     @CreateDateColumn()
     createdAt: Date;

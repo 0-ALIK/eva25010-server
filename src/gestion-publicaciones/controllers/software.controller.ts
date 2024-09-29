@@ -8,12 +8,15 @@ import { PreguntaCustom } from "../../models/pregunta_custom";
 import { Licencia } from "../../models/licencia";
 import { TipoSoftware } from "../../models/tipo_software";
 import { SubtipoSoftware } from "../../models/subtipo_software";
+import { Tecnologia } from "../../models/tecnologia";
+import { SoftwareTecnologia } from "../../models/software_tecnologia";
+import { In } from "typeorm";
 
 export class SoftwareController {
 
     public async crear(req: Request, res: Response): Promise<void> {
         const dataSource = DatabaseConnectionService.connection;
-        const { nombre, descripcion, version, subtipoSoftware, licencia, portada, imagenesPreview, categorias, usuarioAuth } = req.body;
+        const { nombre, descripcion, version, subtipoSoftware, licencia, portada, imagenesPreview, categorias, tecnologias, usuarioAuth } = req.body;
 
         try {
             
@@ -33,6 +36,15 @@ export class SoftwareController {
                     subtipoSoftware: { id: subtipoSoftware },
                     licencia: { id: licencia },
                 });
+
+                const tecnologiasPromises = tecnologias.map(async (tecnologia: any) => {
+                    await transaction.getRepository(SoftwareTecnologia).save({
+                        software: { id: software.id },
+                        tecnologia: { id: tecnologia.id }
+                    });
+                });
+
+                await Promise.all(tecnologiasPromises);
 
                 const imagenesPreviewPromises = imagenesPreview.map(async (imagen: any) => {
                     const uploadResult = await FileUploadService.upload(imagen);
@@ -77,15 +89,38 @@ export class SoftwareController {
     public async editar(req: Request, res: Response): Promise<void> {
         const dataSource = DatabaseConnectionService.connection;
         const { softwareid } = req.params;
-        const { nombre, descripcion, version, subtipoSoftware, licencia, currentSoftware } = req.body;
+        const { nombre, descripcion, version, subtipoSoftware, licencia, currentSoftware, tecnologias } = req.body;
 
         try {
-            await dataSource.getRepository(Software).update(softwareid, {
-                nombre: nombre || currentSoftware.nombre,
-                descripcion: descripcion || currentSoftware.descripcion,
-                version: version || currentSoftware.version,
-                subtipoSoftware: { id: subtipoSoftware || currentSoftware.subtipoSoftware?.id },
-                licencia: { id: licencia || currentSoftware.licencia?.id },
+
+            await dataSource.transaction(async (transaction) => {
+                await transaction.getRepository(Software).update(softwareid, {
+                    nombre: nombre || currentSoftware.nombre,
+                    descripcion: descripcion || currentSoftware.descripcion,
+                    version: version || currentSoftware.version,
+                    subtipoSoftware: { id: subtipoSoftware || currentSoftware.subtipoSoftware?.id },
+                    licencia: { id: licencia || currentSoftware.licencia?.id },
+                });
+
+                const tecnologiasActuales = (currentSoftware as Software).softwareTecnologias.map(st => st.tecnologia.id);
+                const tecnologiasNuevas = tecnologias.map((t: any) => t.id);
+
+                const tecnologiasEliminar = tecnologiasActuales.filter(ta => !tecnologiasNuevas.includes(ta));
+                const tecnologiasAgregar = tecnologiasNuevas.filter((tn: any) => !tecnologiasActuales.includes(tn));
+
+                await transaction.getRepository(SoftwareTecnologia).delete({
+                    software: { id: Number(softwareid) },
+                    tecnologia: { id: In(tecnologiasEliminar) }
+                });
+
+                const tecnologiasAgregarPromises = tecnologiasAgregar.map(async (tn: any) => {
+                    await transaction.getRepository(SoftwareTecnologia).save({
+                        software: { id: Number(softwareid) },
+                        tecnologia: { id: tn }
+                    });
+                });
+
+                await Promise.all(tecnologiasAgregarPromises);
             });
 
             res.status(200).json({ msg: 'Publicación editada con éxito' });
@@ -306,6 +341,68 @@ export class SoftwareController {
         } catch (error) {
             console.error(error);
             res.status(500).json({ msg: 'Error al eliminar una categoria' });
+        }
+    }
+
+    public async obtenerTecnologias(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+
+        try {
+            const tecnologias = await dataSource.getRepository(Tecnologia).find();
+
+            res.status(200).json(tecnologias);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener tecnologias' });
+        }
+    }
+
+    public async agregarPreguntaCustom(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwarecategoriaid } = req.params;
+        const { pregunta } = req.body;
+
+        try {
+            await dataSource.getRepository(PreguntaCustom).save({
+                softwareCategoria: { id: Number(softwarecategoriaid) },
+                descripcion: pregunta
+            });
+
+            res.status(201).json({ msg: 'Pregunta custom agregada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al agregar una pregunta custom' });
+        }
+    }
+
+    public async editarPreguntaCustom(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { preguntaid } = req.params;
+        const { pregunta } = req.body;
+
+        try {
+            await dataSource.getRepository(PreguntaCustom).update(preguntaid, {
+                descripcion: pregunta
+            });
+
+            res.status(200).json({ msg: 'Pregunta custom editada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al editar una pregunta custom' });
+        }
+    }
+
+    public async eliminarPreguntaCustom(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection; 
+        const { preguntaid } = req.params;
+
+        try {
+            await dataSource.getRepository(PreguntaCustom).delete(preguntaid);
+
+            res.status(200).json({ msg: 'Pregunta custom eliminada con éxito' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al eliminar una pregunta custom' });
         }
     }
 

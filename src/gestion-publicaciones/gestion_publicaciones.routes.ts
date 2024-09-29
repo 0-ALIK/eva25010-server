@@ -6,9 +6,9 @@ import { filesToBody } from "../global/middlewares/files";
 import { parseJsonCampos } from "../global/middlewares/parse-json-campos";
 import { check } from "express-validator";
 import { imagenExtensiones, validarExtension } from "../global/validators/validar-extension";
-import { existeCategoria, existeLicencia, existeSubtipoSoftware } from "./validators/existe-software";
+import { existeCategoria, existeLicencia, existePreguntaCustom, existeSoftwareCategoria, existeSubtipoSoftware, existeTecnologia, softwareCategoriaPerteneceSoftware, softwareCategoriaTienePregunta } from "./validators/existe-software";
 import { softwarePertenece } from "./middlewares/pertenece";
-import { existeCategoriaEnSoftware } from "./middlewares/existe";
+import { existeCategoriaEnSoftware, existePreguntaCustomEnCategoria } from "./middlewares/existe";
 
 export class GestionPublicacionesRoutes {
 
@@ -20,7 +20,7 @@ export class GestionPublicacionesRoutes {
         router.post('/software', [
             validarSesion,
             filesToBody,
-            parseJsonCampos(['categorias']),
+            parseJsonCampos(['categorias', 'tecnologias']),
             check('nombre', 'El nombre es requerido').notEmpty(),
             check('nombre', 'El nombre debe tener entre 5 y 100 caracteres').isLength({ min: 5, max: 100 }),
             check('descripcion', 'La descripción es requerida').notEmpty(),
@@ -41,12 +41,16 @@ export class GestionPublicacionesRoutes {
             check('categorias.*.categoria', 'La categoria debe ser string').notEmpty().isString(),
             check('categorias.*.categoria').custom( existeCategoria ),
             check('categorias.*.pregunta', 'La pregunta es requerida').optional().isString(),
+            check('tecnologias', 'Las tecnologias son requeridas').isArray(),
+            check('tecnologias.*', 'Una de las tecnologias no es un número').isNumeric(),
+            check('tecnologias.*').custom( existeTecnologia ),
             mostrarErrores
         ], softwareController.crear);
 
         router.put('/software/:softwareid', [
             validarSesion,
             filesToBody,
+            parseJsonCampos(['tecnologias']),
             check('softwareid', 'El id del software es requerido').notEmpty(),
             check('softwareid', 'El id del software debe ser un número').isNumeric(),
             softwarePertenece(),
@@ -57,6 +61,9 @@ export class GestionPublicacionesRoutes {
             check('licencia').optional().custom( existeLicencia ),
             check('subtipoSoftware', 'El subtipo de software debe ser un número').optional().isNumeric(),
             check('subtipoSoftware').optional().custom( existeSubtipoSoftware ),
+            check('tecnologias', 'Las tecnologias son requeridas').optional().isArray(),
+            check('tecnologias.*', 'Una de las tecnologias no es un número').optional().isNumeric(),
+            check('tecnologias.*').optional().custom( existeTecnologia ),
             mostrarErrores
         ], softwareController.editar);
 
@@ -135,6 +142,40 @@ export class GestionPublicacionesRoutes {
             existeCategoriaEnSoftware(),
             mostrarErrores
         ], softwareController.quitarCategoria);
+
+        router.get('/software/tecnologias', softwareController.obtenerTecnologias);
+
+        router.post('/software/pregunta-custom/:softwareid/:softwarecategoriaid', [
+            validarSesion,
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
+            softwarePertenece(),
+            check('softwarecategoriaid', 'El id de la categoria es requerido').notEmpty(),
+            check('softwarecategoriaid', 'El id de la categoria debe ser un número').isNumeric(),
+            check('softwarecategoriaid').custom( existeSoftwareCategoria ),
+            check('softwarecategoriaid').custom( softwareCategoriaPerteneceSoftware ),
+            check('softwarecategoriaid').not().custom( softwareCategoriaTienePregunta ).withMessage('La categoria ya tiene una pregunta custom'),
+            check('pregunta', 'La pregunta es requerida').notEmpty(), 
+            check('pregunta', 'La pregunta debe tener entre 5 y 100 caracteres').isLength({ min: 5, max: 500 }),
+            mostrarErrores
+        ], softwareController.agregarPreguntaCustom);
+
+        router.put('/software/pregunta-custom/:preguntaid', [
+            validarSesion,
+            check('preguntaid', 'El id de la pregunta custom es requerido').notEmpty(),
+            check('preguntaid', 'El id de la pregunta custom debe ser un número').isNumeric(),
+            check('preguntaid').custom( existePreguntaCustom ),
+            check('pregunta', 'La pregunta debe tener entre 5 y 100 caracteres').optional().isLength({ min: 5, max: 500 }),
+            mostrarErrores
+        ], softwareController.editarPreguntaCustom);
+
+        router.delete('/software/pregunta-custom/:preguntaid', [
+            validarSesion,
+            check('preguntaid', 'El id de la pregunta custom es requerido').notEmpty(),
+            check('preguntaid', 'El id de la pregunta custom debe ser un número').isNumeric(),
+            check('preguntaid').custom( existePreguntaCustom ),
+            mostrarErrores
+        ], softwareController.eliminarPreguntaCustom);
 
         return router;
     }

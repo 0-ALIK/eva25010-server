@@ -1,8 +1,12 @@
+import { Meta } from "express-validator";
 import { DatabaseConnectionService } from "../../global/services/database-connection";
 import { Categoria } from "../../models/categoria";
 import { Licencia } from "../../models/licencia";
+import { SoftwareCategoria } from "../../models/software_categoria";
 import { SubtipoSoftware } from "../../models/subtipo_software";
+import { Tecnologia } from "../../models/tecnologia";
 import { TipoSoftware } from "../../models/tipo_software";
+import { PreguntaCustom } from "../../models/pregunta_custom";
 
 export async function existeLicencia(id: number): Promise<boolean> {
     const dataSource = DatabaseConnectionService.connection;
@@ -39,3 +43,96 @@ export async function existeCategoria(id: string): Promise<boolean> {
     }
     return true;
 }
+
+export async function existeSoftwareCategoria(id: number): Promise<boolean> {
+    const dataSource = DatabaseConnectionService.connection;
+    const softwareCategoria = await dataSource.getRepository(SoftwareCategoria).findOneBy({id});
+    if(!softwareCategoria) {
+        throw new Error(`La categoria de software con id ${id} no existe`);
+    }
+    return true;
+}
+
+export async function softwareCategoriaPerteneceSoftware(id: number, meta: Meta): Promise<boolean> {
+    const dataSource = DatabaseConnectionService.connection;
+
+    if(!meta.req.params) {
+        throw new Error('No se encontraron parametros en la peticion');
+    }
+
+    const { softwareid } = meta.req.params;
+    
+    const softwareCategoria = await dataSource.getRepository(SoftwareCategoria).findOne({
+        where: { id },
+        relations: { software: true }
+    });
+
+    if(!softwareCategoria) {
+        throw new Error(`La categoria de software con id ${id} no existe`);
+    }
+
+    if(softwareCategoria.software.id !== Number(softwareid)) {
+        throw new Error(`La categoria de software con id ${id} no pertenece al software con id ${softwareid}`);
+    }
+
+    return true;
+}
+
+export async function softwareCategoriaTienePregunta(id: number): Promise<boolean> {
+    const dataSource = DatabaseConnectionService.connection;
+
+    const softwareCategoria = await dataSource.getRepository(SoftwareCategoria).findOne({
+        where: { id },
+        relations: { preguntaCustom: true }
+    });
+
+    if(!softwareCategoria) {
+        throw new Error(`La categoria de software con id ${id} no existe`);
+    }
+
+    if(!softwareCategoria.preguntaCustom) {
+        throw new Error(`La categoria de software con id ${id} no tiene una pregunta asociada`);
+    }
+
+    return true;
+}
+
+export async function existePreguntaCustom(id: number, meta: Meta): Promise<boolean> {
+    const dataSource = DatabaseConnectionService.connection;
+
+    if(!meta.req.body) {
+        throw new Error('No se encontraron parametros en la peticion');
+    }
+
+    const { usuarioAuth } = meta.req.body;
+
+    const preguntaCustom = await dataSource.getRepository(PreguntaCustom).findOne({
+        where: { id },
+        relations: { 
+            softwareCategoria: {
+                software: {
+                    usuario: true
+                }
+            }
+        }
+    });
+
+    if(!preguntaCustom) {
+        throw new Error(`La pregunta con id ${id} no existe`);
+    }
+
+    if(preguntaCustom.softwareCategoria.software.usuario.id !== usuarioAuth.id) {
+        throw new Error(`La pregunta con id ${id} no pertenece al usuario autenticado`);
+    }
+    
+    return true;
+}
+
+export async function existeTecnologia(id: number): Promise<boolean> {
+    const dataSource = DatabaseConnectionService.connection;
+    const tecnologia = await dataSource.getRepository(Tecnologia).findOneBy({id});
+    if(!tecnologia) {
+        throw new Error(`La tecnologia con id ${id} no existe`);
+    }
+    return true;
+}   

@@ -17,6 +17,11 @@ export class EvaluacionesRoutes {
             mostrarErrores
         ],evaluacionesController.obtenerSubcategorias);
 
+        router.get('/preguntas/:subcategoriaid', [
+            check('subcategoriaid', 'El id de la subcategoria es obligatorio').not().isEmpty(),
+            mostrarErrores
+        ], evaluacionesController.obtenerPreguntas);
+
         return router;
     }
 }
