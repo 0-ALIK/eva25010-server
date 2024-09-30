@@ -3,6 +3,9 @@ import { DatabaseConnectionService } from '../../global/services/database-connec
 import { Categoria } from '../../models/categoria';
 import { Subcategoria } from '../../models/subcategoria';
 import { Pregunta } from '../../models/pregunta';
+import { Respuesta } from '../../models/respuesta';
+import { Evaluacion } from '../../models/evaluacion';
+import { RespuestaCustom } from '../../models/respuesta_custom';
 
 export class EvaluacionesController {
 
@@ -51,6 +54,69 @@ export class EvaluacionesController {
         } catch (error) {
             console.error(error);
             res.status(500).json({ msg: 'Error al obtener las preguntas' });
+        }
+    }
+
+    public async evaluar(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { respuestas, respuestasCustom, usuarioAuth } = req.body;
+        const { softwareid } = req.params;
+
+        try {
+            await dataSource.transaction(async transaction => {
+
+                const evaluacion = await transaction.getRepository(Evaluacion).create({
+                    usuario: { id: Number(usuarioAuth.id) },
+                    software: { id: Number(softwareid) },
+                });
+
+                await transaction.getRepository(Respuesta).save(Object.entries(respuestas).map(([preguntaid, valor]) => {
+                    const respuesta = transaction.getRepository(Respuesta).create({
+                        pregunta: { id: Number(preguntaid) },
+                        valor: Number(valor),
+                        evaluacion: { id: evaluacion.id }
+                    });
+                    return respuesta;
+                }));
+
+                await transaction.getRepository(RespuestaCustom).save(Object.entries(respuestasCustom).map(([preguntaid, valor]) => {
+                    const respuestaCustom = transaction.getRepository(RespuestaCustom).create({
+                        pregunta: { id: Number(preguntaid) },
+                        valor: Number(valor),
+                        evaluacion: { id: evaluacion.id }
+                    });
+                    return respuestaCustom;
+                }));
+
+            }); 
+
+            res.status(200).json({ msg: 'Evaluación guardada correctamente' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al guardar la evaluación' });
+        }
+    }
+
+    public async obtenerEvaluacionesPropias(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { usuarioAuth } = req.body;
+
+        try {
+            const evaluaciones = await dataSource.getRepository(Evaluacion).find({
+                where: {
+                    usuario: { id: usuarioAuth.id }
+                },
+                relations: {
+                    software: {
+                        usuario: true,
+                    },
+                }
+            });
+
+            res.json(evaluaciones);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener las evaluaciones' });
         }
     }
 
