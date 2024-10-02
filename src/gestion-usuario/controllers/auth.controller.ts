@@ -18,13 +18,14 @@ export class AuthController {
                 },
                 select: {
                     id: true,
+                    foto: true,
                     nombre: true,
                     apellido: true,
                     cargo: true,
                     correo: true,
                     password: true,
                     createdAt: true,
-                    updatedAt: true 
+                    updatedAt: true, 
                 }
             });
 
@@ -53,6 +54,12 @@ export class AuthController {
             return res.status(500).json({ msg: 'Error al iniciar sesión' });
         }
     }   
+
+    public async verify(req: Request, res: Response) {
+        const { usuarioAuth } = req.body;
+        const { id, correo, password, ...usuario } = usuarioAuth;
+        res.status(200).json(usuario);
+    }
 
     public async register(req: Request, res: Response) {
         const dataSource = DatabaseConnectionService.connection;

@@ -23,6 +23,8 @@ export class GestionUsuarioRoutes {
             mostrarErrores
         ], authController.login);
 
+        router.get('/auth/verify', validarSesion, authController.verify);
+
         router.post('/auth/register', [
             check('nombre', 'El nombre es obligatorio').notEmpty(),
             check('nombre', 'El nombre debe tener al menos 2 caracteres y maximo 100').isLength({min: 2, max: 100}),
