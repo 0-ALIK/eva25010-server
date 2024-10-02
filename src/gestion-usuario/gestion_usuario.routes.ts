@@ -51,6 +51,10 @@ export class GestionUsuarioRoutes {
             mostrarErrores
         ], usuarioController.update);
 
+        router.get('/usuarios', [
+            
+        ], usuarioController.obtener);
+
         router.post('/usuarios/foto', [
             validarSesion,
             filesToBody,

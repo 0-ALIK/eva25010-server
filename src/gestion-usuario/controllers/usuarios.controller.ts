@@ -6,6 +6,33 @@ import { Profesion } from "../../models/profesion";
 
 export class UsuariosController {
 
+    public async obtener(req: Request, res: Response) {
+        const dataSource = DatabaseConnectionService.connection;
+        
+        try {
+            const usuarios = await dataSource.getRepository(Usuario).find({
+                order: {
+                    createdAt: 'ASC'
+                },
+                relations: {
+                    profesion: true
+                }
+            });
+
+            const newUsuarios = usuarios.map(usuario => {
+                delete (usuario as any).password;
+                delete (usuario as any).correo;
+
+                return usuario;
+            });
+
+            return res.status(200).json(newUsuarios);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ msg: 'Error al obtener usuario' });
+        }
+    }
+
     public async update(req: Request, res: Response) {
         const dataSource = DatabaseConnectionService.connection;
         const { usuarioAuth, nombre, apellido, cargo, profesionId } = req.body;

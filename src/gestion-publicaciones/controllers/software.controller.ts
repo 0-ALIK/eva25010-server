@@ -10,9 +10,50 @@ import { TipoSoftware } from "../../models/tipo_software";
 import { SubtipoSoftware } from "../../models/subtipo_software";
 import { Tecnologia } from "../../models/tecnologia";
 import { SoftwareTecnologia } from "../../models/software_tecnologia";
-import { In } from "typeorm";
+import { In, Like } from "typeorm";
 
 export class SoftwareController {
+
+    public async obtener(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { search, tipo, licencia } = req.query;
+
+        let where: any = {};
+
+        if(search) {
+            where.nombre = Like(`%${search}%`);
+        }
+
+        if(tipo) {
+            where.subtipoSoftware = {
+                tipoSoftware: {
+                    id: Number(tipo)
+                }
+            }
+        }
+
+        if(licencia) {
+            where.licencia = {
+                id: Number(licencia)
+            }
+        }
+
+        try {
+            const software = await dataSource.getRepository(Software).find({
+                where,
+                relations: {
+                    subtipoSoftware: true,
+                    licencia: true,
+                    usuario: true
+                }
+            });
+
+            res.status(200).json(software);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener publicaciones' });
+        }
+    }
 
     public async crear(req: Request, res: Response): Promise<void> {
         const dataSource = DatabaseConnectionService.connection;

@@ -17,6 +17,14 @@ export class GestionPublicacionesRoutes {
 
         const softwareController = new SoftwareController();
 
+        router.get('/software', [
+            check('search', 'El campo search debe ser string').optional().isString(),
+            check('search', 'El campo search debe tener entre 1 y 100 caracteres').optional().isLength({ min: 1, max: 100 }),
+            check('tipo', 'El campo tipo debe ser un número').optional().isNumeric(),
+            check('licenia', 'El campo licencia debe ser un número').optional().isNumeric(),
+            mostrarErrores
+        ], softwareController.obtener);
+
         router.post('/software', [
             validarSesion,
             filesToBody,
