@@ -55,6 +55,43 @@ export class SoftwareController {
         }
     }
 
+    public async obtenerById(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid } = req.params;
+
+        try {
+            const software = await dataSource.getRepository(Software).findOne({
+                where: {
+                    id: Number(softwareid),
+                },
+                relations: {
+                    subtipoSoftware: { tipoSoftware: true },
+                    licencia: true,
+                    imagenesPreview: true,
+                    categorias: {
+                        categoria: true,
+                        preguntaCustom: true
+                    },
+                    evaluaciones: {
+                        usuario: true,
+                        comentario: true,
+                    },
+                    softwareTecnologias: {
+                        tecnologia: true,
+                    },
+                    usuario: {
+                        profesion: true,
+                    }
+                }
+            });
+
+            res.status(200).json(software);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener publicacion por id' });
+        }
+    }
+
     public async crear(req: Request, res: Response): Promise<void> {
         const dataSource = DatabaseConnectionService.connection;
         const { nombre, descripcion, version, subtipoSoftware, licencia, portada, imagenesPreview, categorias, tecnologias, usuarioAuth } = req.body;

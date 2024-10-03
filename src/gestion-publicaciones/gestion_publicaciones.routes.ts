@@ -95,6 +95,12 @@ export class GestionPublicacionesRoutes {
             mostrarErrores
         ], softwareController.obtenerSoftwarePropiosById);
 
+        router.get('/software/obtener/:softwareid', [
+            check('softwareid', 'El id del software es requerido').notEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
+            mostrarErrores
+        ], softwareController.obtenerById)
+
         router.post('/software/portada/:softwareid', [
             validarSesion,
             filesToBody,
