@@ -13,7 +13,7 @@ export class VisualizacionResultadosRoutes {
 
         const resultadosController = new ResultadosController();
 
-        router.get('/resultados/total-evaluaciones/:softwareid', [
+        router.get('/total-evaluaciones/:softwareid', [
             validarSesion,
             check('softwareid', 'El softwareid es obligatorio').notEmpty(),
             check('softwareid', 'El softwareid debe ser un número').isNumeric(),
@@ -21,15 +21,15 @@ export class VisualizacionResultadosRoutes {
             mostrarErrores
         ], resultadosController.obtenerTotalEvaluaciones);
 
-        router.get('/resultados/promedio-final/:softwareid', [
+        router.get('/promedio-final/:softwareid', [
             validarSesion,
             check('softwareid', 'El softwareid es obligatorio').notEmpty(),
             check('softwareid', 'El softwareid debe ser un número').isNumeric(),
             softwarePertenece(),
             mostrarErrores
-        ], );
+        ], resultadosController.obtenerPromedioFinal);
 
-        router.get('/resultados/preguntas/total/:softwareid/:preguntaid', [
+        router.get('/preguntas/total/:softwareid/:preguntaid', [
             validarSesion,
             check('softwareid', 'El softwareid es obligatorio').notEmpty(),
             check('softwareid', 'El softwareid debe ser un número').isNumeric(),
@@ -38,7 +38,7 @@ export class VisualizacionResultadosRoutes {
             check('preguntaid', 'El preguntaid debe ser un número').isNumeric(),
             check('preguntaid').custom( existePreguntaCustom ),
             mostrarErrores
-        ], );
+        ], resultadosController.obtenerTotalPreguntas);
 
         return router;
     }

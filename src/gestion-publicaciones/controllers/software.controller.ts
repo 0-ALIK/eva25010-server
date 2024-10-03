@@ -85,6 +85,10 @@ export class SoftwareController {
                 }
             });
 
+            if(software) {
+                software.evaluaciones = software.evaluaciones.slice(0, 5);
+            }
+
             res.status(200).json(software);
         } catch (error) {
             console.error(error);
