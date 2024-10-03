@@ -7,6 +7,7 @@ import { SubtipoSoftware } from "../../models/subtipo_software";
 import { Tecnologia } from "../../models/tecnologia";
 import { TipoSoftware } from "../../models/tipo_software";
 import { PreguntaCustom } from "../../models/pregunta_custom";
+import { Pregunta } from "../../models/pregunta";
 
 export async function existeLicencia(id: number): Promise<boolean> {
     const dataSource = DatabaseConnectionService.connection;
@@ -126,6 +127,41 @@ export async function existePreguntaCustom(id: number, meta: Meta): Promise<bool
     }
     
     return true;
+}
+
+export async function existePregunta(id: number, meta: Meta): Promise<boolean> {
+    const dataSource = DatabaseConnectionService.connection;
+
+    if(!meta.req.body) {
+        throw new Error('No se encontraron parametros en la peticion');
+    }
+
+    const { usuarioAuth } = meta.req.body;
+
+    const pregunta = await dataSource.getRepository(Pregunta).findOne({
+        where: { id },
+        relations: { 
+            subcategoria: {
+                categoria: {
+                    softwareCategorias: {
+                        software: {
+                            usuario: true
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    if(!pregunta) {
+        throw new Error(`La pregunta con id ${id} no existe`);
+    }
+
+    if(pregunta.subcategoria.categoria.softwareCategorias.some(softwareCategoria => softwareCategoria.software.usuario.id === usuarioAuth.id)) {
+        return true;
+    }
+    
+    throw new Error(`La pregunta con id ${id} no pertenece al usuario autenticado`);
 }
 
 export async function existeTecnologia(id: number): Promise<boolean> {
