@@ -24,6 +24,12 @@ export class EvaluacionesRoutes {
             mostrarErrores
         ], evaluacionesController.obtenerPreguntas);
 
+        router.get('/preguntas-custom/:softwareid', [
+            check('softwareid', 'El id del software es obligatorio').not().isEmpty(),
+            check('softwareid', 'El id del software debe ser un número').isNumeric(),
+            mostrarErrores
+        ], evaluacionesController.obtenerPreguntasCustom)
+
         router.get('/propias', [
             validarSesion,
             mostrarErrores

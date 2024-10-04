@@ -6,6 +6,7 @@ import { Pregunta } from '../../models/pregunta';
 import { Respuesta } from '../../models/respuesta';
 import { Evaluacion } from '../../models/evaluacion';
 import { RespuestaCustom } from '../../models/respuesta_custom';
+import { PreguntaCustom } from '../../models/pregunta_custom';
 
 export class EvaluacionesController {
 
@@ -117,6 +118,31 @@ export class EvaluacionesController {
         } catch (error) {
             console.error(error);
             res.status(500).json({ msg: 'Error al obtener las evaluaciones' });
+        }
+    }
+
+    public async obtenerPreguntasCustom(req: Request, res: Response): Promise<void> {
+        const dataSource = DatabaseConnectionService.connection;
+        const { softwareid } = req.params;
+
+        try {
+            const preguntas = await dataSource.getRepository(PreguntaCustom).find({
+                where: {
+                    softwareCategoria: {
+                        software: { id: Number(softwareid) }
+                    }
+                },
+                relations: {
+                    softwareCategoria: {
+                        categoria: true
+                    }
+                }
+            }); 
+
+            res.json(preguntas);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ msg: 'Error al obtener las preguntas custom' });
         }
     }
 
