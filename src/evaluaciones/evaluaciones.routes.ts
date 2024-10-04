@@ -45,7 +45,7 @@ export class EvaluacionesRoutes {
             check('respuestas.*', 'Las respuestas deben ser un número').isNumeric(),
             check('respuestasCustom', 'Las respuestas custom son obligatorias').notEmpty(),
             check('respuestasCustom', 'Respuestas custom deber ser un objeto').isObject(),
-            check('respuestasCustom.*', 'Las respuestas custom deben ser un objeto').isObject(),
+            check('respuestasCustom.*', 'Las respuestas custom deben ser un objeto').isNumeric(),
             mostrarErrores
         ], evaluacionesController.evaluar);
 
