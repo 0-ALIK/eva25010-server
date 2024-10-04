@@ -66,7 +66,7 @@ export class EvaluacionesController {
         try {
             await dataSource.transaction(async transaction => {
 
-                const evaluacion = await transaction.getRepository(Evaluacion).create({
+                const evaluacion = await transaction.getRepository(Evaluacion).save({
                     usuario: { id: Number(usuarioAuth.id) },
                     software: { id: Number(softwareid) },
                 });
