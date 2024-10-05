@@ -24,6 +24,9 @@ export class Software extends BaseEntity {
     @Column({type: 'text'})
     public descripcion: string;
 
+    @Column({length: 2083, nullable: true})
+    public enlace: string;
+
     @ManyToOne(() => Usuario, usuario => usuario.software, {onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     public usuario: Usuario;
 
