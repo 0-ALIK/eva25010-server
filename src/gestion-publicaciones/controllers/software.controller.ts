@@ -44,7 +44,9 @@ export class SoftwareController {
                 relations: {
                     subtipoSoftware: true,
                     licencia: true,
-                    usuario: true
+                    usuario: {
+                        profesion: true,
+                    }
                 }
             });
 
