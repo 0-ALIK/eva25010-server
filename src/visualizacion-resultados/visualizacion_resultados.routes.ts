@@ -35,7 +35,7 @@ export class VisualizacionResultadosRoutes {
             check('softwareid', 'El softwareid debe ser un número').isNumeric(),
             softwarePertenece(),
             check('categoriaid', 'El categoriaid es obligatorio').notEmpty(),
-            check('categoriaid', 'El categoriaid debe ser un número').isNumeric(),
+            check('categoriaid', 'El categoriaid debe ser un número').isString(),
             check('categoriaid').custom( existeCategoria),
             mostrarErrores
         ], resultadosController.obtenerPromedioFinalCategoria);
@@ -46,7 +46,7 @@ export class VisualizacionResultadosRoutes {
             check('softwareid', 'El softwareid debe ser un número').isNumeric(),
             softwarePertenece(),
             check('subcategoriaid', 'El subcategoriaid es obligatorio').notEmpty(),
-            check('subcategoriaid', 'El subcategoriaid debe ser un número').isNumeric(),
+            check('subcategoriaid', 'El subcategoriaid debe ser un número').isString(),
             mostrarErrores
         ], resultadosController.obtenerPromedioFinalSubcategoria);
 

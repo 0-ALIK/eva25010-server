@@ -32,6 +32,8 @@ export class FileUploadService {
                 public_id: result.public_id
             };
         } catch (error) {
+            console.log(error);
+            
             return {
                 correct: false
             };
