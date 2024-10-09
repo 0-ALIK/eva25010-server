@@ -4,6 +4,7 @@ import { check } from "express-validator";
 import { mostrarErrores } from "../global/middlewares/mostrar-errores";
 import { validarSesion } from "../global/middlewares/validar-sesion";
 import { softwarePertenece } from "../gestion-publicaciones/middlewares/pertenece";
+import { yaEvaluado } from "./middleware/tiene";
 
 export class EvaluacionesRoutes {
 
@@ -40,6 +41,7 @@ export class EvaluacionesRoutes {
             check('softwareid', 'El id del software es obligatorio').not().isEmpty(),
             check('softwareid', 'El id del software debe ser un número').isNumeric(),
             softwarePertenece(false),
+            yaEvaluado,
             check('respuestas', 'Las respuestas son obligatorias').notEmpty(),
             check('respuestas', 'Respuestas deber ser un objeto').isObject(),
             check('respuestas.*', 'Las respuestas deben ser un número').isNumeric(),

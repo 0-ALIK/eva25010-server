@@ -57,7 +57,7 @@ export class AuthController {
 
     public async verify(req: Request, res: Response) {
         const { usuarioAuth } = req.body;
-        const { id, correo, password, ...usuario } = usuarioAuth;
+        const { correo, password, ...usuario } = usuarioAuth;
         res.status(200).json(usuario);
     }
 
